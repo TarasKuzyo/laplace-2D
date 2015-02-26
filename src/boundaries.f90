@@ -1,0 +1,212 @@
+
+
+
+
+!---------------------------------------------------------
+!---------------------------------------------------------
+!---------------------------------------------------------
+!
+!          Equation:
+!
+!          $ u_{xx} + u_{yy} = f(x, y) $
+!
+!          Geometry:
+!
+!                   fx1(x)
+!           _____________________
+!          |                     |
+!          |                     |
+!          |                     |
+!          |                     |
+!          |                     |
+!  fy0(y)  |    fsource(x, y)    |  fy1(y)
+!          |                     |
+!          |                     |
+!          |                     |
+!          |                     |
+!          |_____________________|
+!
+!                   fx0(x)
+!
+!
+!
+!---------------------------------------------------------
+!---------------------------------------------------------
+!---------------------------------------------------------  
+
+
+
+module boundaries
+
+    implicit none
+    real(kind=8), parameter :: pi = 4.0*atan(1.0)
+
+contains
+
+    !-------------------------------------------------------------------------
+    !
+    !                              1D boundaries
+    !
+    !-------------------------------------------------------------------------
+
+    elemental function f0()
+    
+        real(kind=8) :: f0
+        
+        f0 = 0d0
+        
+    end function f0
+    
+    
+    elemental function f1()
+    
+        real(kind=8) :: f1
+        
+        f1 = 0d0
+        
+    end function f1
+
+
+    !-------------------------------------------------------------------------
+    !
+    !                              2D boundaries
+    !
+    !-------------------------------------------------------------------------
+    
+    
+    elemental function fx0(x)
+    
+        real(kind=8), intent(in) :: x
+        real(kind=8) :: fx0
+        
+        fx0 = log((x+1)**2)
+        
+    end function fx0
+    
+    
+    elemental function fx1(x)
+    
+        real(kind=8), intent(in) :: x
+        real(kind=8) :: fx1
+        
+        fx1 = log((x+1)**2 + 1**2)
+    
+    end function fx1
+    
+    
+    elemental function fy0(y)
+    
+        real(kind=8), intent(in) :: y
+        real(kind=8) :: fy0
+        
+        fy0 = log((1)**2 + y**2)
+    
+    end function fy0
+    
+    
+    elemental function fy1(y)
+    
+        real(kind=8), intent(in) :: y
+        real(kind=8) :: fy1
+        
+        fy1 = log((1+1)**2 + y**2)
+    
+    end function fy1
+    
+    
+    !-------------------------------------------------------------------------
+    !
+    !                              3D boundaries
+    !
+    !-------------------------------------------------------------------------   
+    
+    
+    elemental function fxy0(x, y)
+    
+        real(kind=8), intent(in) :: x, y
+        real(kind=8) :: fxy0
+        
+        fxy0 = x**2 + y**2
+        
+    end function fxy0 
+    
+    
+    elemental function fxy1(x, y)
+    
+        real(kind=8), intent(in) :: x, y
+        real(kind=8) :: fxy1
+        
+        fxy1 = x**2 + y**2 + 1d0
+        
+    end function fxy1
+    
+    
+    elemental function fyz0(y, z)
+    
+        real(kind=8), intent(in) :: y, z
+        real(kind=8) :: fyz0
+        
+        fyz0 = y**2 + z**2
+        
+    end function fyz0
+    
+    
+    elemental function fyz1(y, z)
+    
+        real(kind=8), intent(in) :: y, z
+        real(kind=8) :: fyz1
+        
+        fyz1 = y**2 + z**2 + 1d0
+        
+    end function fyz1
+    
+    
+    elemental function fxz0(x, z)
+    
+        real(kind=8), intent(in) :: x, z
+        real(kind=8) :: fxz0
+        
+        fxz0 = x**2 + z**2
+        
+    end function fxz0
+    
+    
+    elemental function fxz1(x, z)
+    
+        real(kind=8), intent(in) :: x, z
+        real(kind=8) :: fxz1
+        
+        fxz1 = x**2 + z**2 + 1d0
+        
+    end function fxz1
+    
+    
+    !-------------------------------------------------------------------------
+    !
+    !                         source term function
+    !
+    !-------------------------------------------------------------------------   
+    
+    elemental function fsource(x, y, z)
+    
+        real(kind=8), intent(in) :: x, y, z
+        real(kind=8) :: fsource
+    
+        fsource = 0.0d0
+    
+    end function fsource
+    
+    
+    elemental function fexact(x, y, z)
+    
+        real(kind=8), intent(in) :: x, y, z
+        real(kind=8) :: fexact
+    
+        fexact = log((x+1)**2 + y**2 + z**2)
+    
+    end function fexact
+    
+
+end module boundaries
+
+
