@@ -53,7 +53,7 @@ contains
     
         real(kind=8) :: f0
         
-        f0 = 0d0
+        f0 = 1d0
         
     end function f0
     
@@ -62,7 +62,7 @@ contains
     
         real(kind=8) :: f1
         
-        f1 = 0d0
+        f1 = 5d0
         
     end function f1
 
@@ -79,7 +79,7 @@ contains
         real(kind=8), intent(in) :: x
         real(kind=8) :: fx0
         
-        fx0 = log((x+1)**2)
+        fx0 = 0.0d0
         
     end function fx0
     
@@ -89,7 +89,7 @@ contains
         real(kind=8), intent(in) :: x
         real(kind=8) :: fx1
         
-        fx1 = log((x+1)**2 + 1**2)
+        fx1 = 2d0*x*(1d0 - x)
     
     end function fx1
     
@@ -99,7 +99,7 @@ contains
         real(kind=8), intent(in) :: y
         real(kind=8) :: fy0
         
-        fy0 = log((1)**2 + y**2)
+        fy0 = 3d0*y*(1d0 - y)
     
     end function fy0
     
@@ -109,7 +109,7 @@ contains
         real(kind=8), intent(in) :: y
         real(kind=8) :: fy1
         
-        fy1 = log((1+1)**2 + y**2)
+        fy1 = 4d0*y*(1d0 - y)
     
     end function fy1
     
@@ -126,7 +126,7 @@ contains
         real(kind=8), intent(in) :: x, y
         real(kind=8) :: fxy0
         
-        fxy0 = x**2 + y**2
+        fxy0 = 0
         
     end function fxy0 
     
@@ -136,7 +136,7 @@ contains
         real(kind=8), intent(in) :: x, y
         real(kind=8) :: fxy1
         
-        fxy1 = x**2 + y**2 + 1d0
+        fxy1 = 0
         
     end function fxy1
     
@@ -146,7 +146,7 @@ contains
         real(kind=8), intent(in) :: y, z
         real(kind=8) :: fyz0
         
-        fyz0 = y**2 + z**2
+        fyz0 = 0
         
     end function fyz0
     
@@ -156,7 +156,7 @@ contains
         real(kind=8), intent(in) :: y, z
         real(kind=8) :: fyz1
         
-        fyz1 = y**2 + z**2 + 1d0
+        fyz1 = 0
         
     end function fyz1
     
@@ -176,7 +176,7 @@ contains
         real(kind=8), intent(in) :: x, z
         real(kind=8) :: fxz1
         
-        fxz1 = x**2 + z**2 + 1d0
+        fxz1 = - x**2 + z**2
         
     end function fxz1
     
