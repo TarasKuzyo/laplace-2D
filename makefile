@@ -1,5 +1,5 @@
 FC=gfortran
-FCFLAGS=-g -O2
+FCFLAGS=-g -O2 -Wall
 FLFLAGS=
 
 SOURCES=$(wildcard src/*.f90)

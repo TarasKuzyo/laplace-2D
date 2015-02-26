@@ -5,7 +5,7 @@ module utils
     
     type confargs
         integer       :: ndim, maxiter, d(3)
-        real(kind=8)  :: start_pos(3), end_pos(3), eps
+        real(kind=8)  :: start_pos(3), end_pos(3), dx(3), eps
         character(16) :: solver
     end type confargs
 
@@ -18,11 +18,10 @@ contains
         character(len=*), intent(in) :: filename
         type(confargs),  intent(out) :: args
         
-        integer :: n_dim
         character(len=16) :: skip_buffer
         
         integer, parameter :: read_uid = 21
-        integer :: i, j, openstatus
+        integer :: i, openstatus
         
         open(unit=read_uid, file=filename, action="read", iostat=openstatus)
         if (openstatus > 0) stop "Cannot open config file to read."
@@ -42,15 +41,27 @@ contains
             if (i > args%ndim) args%d(i) = 1
         end do
         
+        args%dx = (args%end_pos - args%start_pos)/(args%d - 1)
+        
         if (debug) then
-            write(*, *) args
+            write(*, *) '----------------- problem setup ----------------------------------------------'
+            write(*, *)
+            write(*, *) 'dimensions : ', args%ndim
+            write(*, *) 'tolerance  : ', args%eps
+            write(*, *) 'maxiter    : ', args%maxiter
+            write(*, *) 'solver     : ', args%solver
+            write(*, *) 'x-dir      : ', args%start_pos(1), args%end_pos(1), args%d(1)
+            write(*, *) 'y-dir      : ', args%start_pos(2), args%end_pos(2), args%d(2)
+            write(*, *) 'z-dir      : ', args%start_pos(3), args%end_pos(3), args%d(3)
+            write(*, *)
+            write(*, *) '------------------------------------------------------------------------------'
         end if
         
         close(read_uid)
         
     end subroutine read_config   
     
-    
+
     subroutine write_binary(filename, data_array)
     
         character(len=*), intent(in) :: filename
@@ -71,3 +82,6 @@ contains
                       
         
 end module utils
+
+
+

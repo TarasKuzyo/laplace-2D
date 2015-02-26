@@ -12,7 +12,7 @@ contains
         integer :: sz
         real(kind=8) :: bounds(size(index_arr))
         
-        bounds = start_val + (index_arr - 1)*end_val/(sz - 1)
+        bounds = start_val + (index_arr - 1)*(end_val - start_val)/(sz - 1)
         
     end function bounds
     
@@ -24,7 +24,7 @@ contains
         type(confargs), intent(in) :: args
         
         
-        integer :: i, j, k, alstat
+        integer :: i, j, k
         real(kind=8), dimension(:) :: xx(size(u, 1)), yy(size(u, 2)), zz(size(u, 3))
         
         xx = (/ (i, i = 1, size(u, 1)) /)

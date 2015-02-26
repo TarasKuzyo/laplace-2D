@@ -187,14 +187,14 @@ contains
     !
     !-------------------------------------------------------------------------   
     
-    elemental function fsource(x, y, z)
+    elemental function fsrc(x, y, z)
     
         real(kind=8), intent(in) :: x, y, z
-        real(kind=8) :: fsource
+        real(kind=8) :: fsrc
     
-        fsource = 0.0d0
+        fsrc = 0.0d0
     
-    end function fsource
+    end function fsrc
     
     
     elemental function fexact(x, y, z)

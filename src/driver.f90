@@ -1,26 +1,40 @@
 program driver
 
-    use utils, only: confargs, read_config, write_binary
-    use init,  only: initialize
+    use utils,   only: confargs, read_config, write_binary
+    use init,    only: initialize
+    use laplace, only: laplace_solve
     implicit none
     
     type(confargs) :: args
-    integer :: alstat
-    real(kind=8), allocatable :: u(:, :, :)
+    integer :: alstat, nsteps
+    character(len=64) :: config_filename, output_filename
+    real(kind=8), allocatable :: u(:, :, :), source(:, :, :)
     
-    write(*, *) 'Hello, world!'
+    config_filename = 'laplace.ini'
+    output_filename = 'output.dbl'
     
-    call read_config("laplace.ini", args)
+    if (command_argument_count() == 1) then
+        call get_command_argument(1, output_filename)
+        write(*, *) output_filename
+    end if
+    
+    
+    call read_config(config_filename, args)
+    
     
     allocate( u(args%d(1), args%d(2), args%d(3)), stat=alstat )
     if (alstat /= 0) stop "Unable to allocate memory for the data array."
     
-    call initialize(args, u)
+    allocate( source(args%d(1), args%d(2), args%d(3)), stat=alstat )
+    if (alstat /= 0) stop "Unable to allocate memory for the source term."
     
+    call initialize(u, source, args)
+    call laplace_solve(u, source, args, nsteps)
     
-    call write_binary('output.dbl', u)
+    call write_binary(output_filename, u)
         
-    deallocate(u)
+    deallocate(u, source)
+
 
 end program driver
 
