@@ -6,31 +6,34 @@ module init
     
 contains 
 
-    function bounds(index_arr, start_val, end_val)
+    function bounds(index_arr, start_val, end_val, sz)
     
         real(kind=8), intent(in) :: index_arr(:), start_val, end_val
+        integer :: sz
         real(kind=8) :: bounds(size(index_arr))
         
-        bounds = start_val + (index_arr - 1)*end_val/(size(index_arr) - 1)
+        bounds = start_val + (index_arr - 1)*end_val/(sz - 1)
         
     end function bounds
     
 
-    subroutine initialize(args, u)
+    subroutine initialize(u, src, args)
         
-        type(confargs), intent(in) :: args
         real(kind=8),  intent(out) :: u(:, :, :)
+        real(kind=8),  intent(out) :: src(:, :, :)
+        type(confargs), intent(in) :: args
         
-        integer :: i, j, k
+        
+        integer :: i, j, k, alstat
         real(kind=8), dimension(:) :: xx(size(u, 1)), yy(size(u, 2)), zz(size(u, 3))
         
         xx = (/ (i, i = 1, size(u, 1)) /)
         yy = (/ (i, i = 1, size(u, 2)) /)
         yy = (/ (i, i = 1, size(u, 3)) /)
         
-        xx = bounds(xx, args%start_pos(1), args%end_pos(1))
-        yy = bounds(yy, args%start_pos(2), args%end_pos(2))
-        zz = bounds(zz, args%start_pos(3), args%end_pos(3))
+        xx = bounds(xx, args%start_pos(1), args%end_pos(1), size(xx))
+        yy = bounds(yy, args%start_pos(2), args%end_pos(2), size(yy))
+        zz = bounds(zz, args%start_pos(3), args%end_pos(3), size(zz))
         
         ! set the whole array to zero
         u = 0.0d0
@@ -57,7 +60,16 @@ contains
             stop "Invalid value for ndim."
         end if
         
+        do k = 1, size(u, 3) 
+            do j = 1, size(u, 2)
+                do i = 1, size(u, 1)
+                    src(i, j, k) = fsrc(xx(i), yy(j), zz(k))
+                end do
+            end do
+        end do
         
     end subroutine initialize        
 
 end module init
+
+
