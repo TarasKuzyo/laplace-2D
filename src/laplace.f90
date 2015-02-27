@@ -1,21 +1,28 @@
 module laplace 
+!
+!  created by Taras Kuzyo 
+!  as part of laplace-2D numerical code
 
-    use globals, only: debug
+!
+!  defines and interface for the solution
+!  subroutine and a number of different 
+!  solving subroutines using different methods
+!
+    use globals, only: debug, pi
     use utils, only: confargs
     implicit none
-
+    
 contains
-
 
     subroutine laplace_solve(u, src, args, nsteps)
     
-        real(kind=8), intent(inout) :: u(:, :, :)
-        real(kind=8),   intent(in) :: src(:, :, :)
-        type(confargs), intent(in) :: args
-        integer, intent(out) :: nsteps
+        real(kind=8), intent(inout) :: u(:, :)
+        real(kind=8), intent(in)    :: src(:, :)
+        type(confargs), intent(in)  :: args
+        integer, intent(out)        :: nsteps
     
-        if (args%solver == 'SOR5') then
-            call laplace_set_solver(u, src,  SOR5, args, nsteps)
+        if (args%solver == 'SOR5') then 
+            call laplace_setup_solver(u, src,  SOR5, args, nsteps)
         else
             stop "invalid solver set."
         end if
@@ -23,17 +30,23 @@ contains
     end subroutine laplace_solve
     
 
-    subroutine laplace_set_solver(u, src,  solver, args, nsteps)
+    subroutine laplace_setup_solver(u, src,  solver, args, nsteps)
     
-        real(kind=8), intent(inout) :: u(:, :, :)
-        real(kind=8),   intent(in)  :: src(:, :, :)
-        external                    :: solver
+        real(kind=8), intent(inout) :: u(:, :)
+        real(kind=8), intent(in)    :: src(:, :)
         type(confargs), intent(in)  :: args
         integer, intent(out)        :: nsteps
         
+        interface
+            subroutine solver(u, src, dx, dy, change)
+               real(kind=8), intent(inout) :: u(:, :) 
+               real(kind=8), intent(in)    :: src(:, :), dx, dy
+               real(kind=8), intent(out)   :: change
+            end subroutine solver
+        end interface
         
         integer :: k = 0, kmax
-        real(kind=8) :: tolerance, change   
+        real(kind=8) :: tolerance, change 
         
         kmax = args%maxiter
         tolerance = args%eps
@@ -41,32 +54,46 @@ contains
         
         ! iterate the solution until it converges below the level of the tolerance
         do while ((change > tolerance) .and. (k < kmax))
-            call solver(u, src, change)
+            call solver(u, src, args%dx(1), args%dx(2), change)
             k = k + 1
         end do
         
         nsteps = k
         if (nsteps == kmax) write (*, *) 'warning: the maximum number of iterations reached'
+        write (*, *) 'nsteps = ', nsteps
     
-    end subroutine laplace_set_solver
+    end subroutine laplace_setup_solver
 
 
-    subroutine SOR5(u, src, change)
+    subroutine SOR5(u, src, dx, dy, change)
     
-        real(kind=8), intent(inout) :: u(:, :, :)
-        real(kind=8), intent(in)    :: src(:, :, :)
+        real(kind=8), intent(inout) :: u(:, :)
+        real(kind=8), intent(in)    :: src(:, :), dx, dy
         real(kind=8), intent(out)   :: change
 
-        integer :: i, j, n_x, n_y
+        integer :: i, j
         real(kind=8) :: diff, omega
-        real(kind=8) :: dx, dy, alpha, beta
+        real(kind=8) :: alpha, beta
         
-        n_x = size(u, dim=1) 
-        n_y = size(u, dim=2)
+        alpha = dy**2/(dx**2 + dy**2)
+        beta  = dx**2/(dx**2 + dy**2)
         
-        change =  1.0
+        omega = 2d0 - 2d0*pi*sqrt(dx*dy)
+        !4.0d0/(2.0 + sqrt( 4 - (cos(pi/n_x) + cos(pi/n_y))**2) )
         
-                   
+        change = 0.0
+        do j = lbound(u, 2) + 1, ubound(u, 2) - 1
+            do i = lbound(u, 1) + 1, ubound(u, 1) - 1
+                diff = 0.5*omega * ( alpha * ( u(i+1, j) + u(i-1, j) ) + &
+                                     beta  * ( u(i, j+1) + u(i, j-1) ) - &
+                                     2d0*u(i, j) - 0.5 * src(i, j) )
+
+                u(i, j) = u(i, j) + diff
+                change  = max(change, abs(diff))
+                
+            end do
+        end do
+              
     end subroutine SOR5
 
 

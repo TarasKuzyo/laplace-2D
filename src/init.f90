@@ -1,4 +1,12 @@
 module init
+
+!
+!  created by Taras Kuzyo 
+!  as part of laplace-2D numerical code
+!
+!  Defines a function for the initilization of 
+!  solution array and source term array.
+!
     
     use utils, only: confargs
     use boundaries
@@ -6,65 +14,54 @@ module init
     
 contains 
 
-    function bounds(index_arr, start_val, end_val, sz)
+    !
+    ! Takes an array of indexes in range 1..n, values of lower and 
+    ! upper bounds for the new array. Returns array of the original 
+    ! size with its values in range of lower .. upper.
+    !
+    function bounds(index_arr, start_val, end_val)
     
         real(kind=8), intent(in) :: index_arr(:), start_val, end_val
-        integer :: sz
         real(kind=8) :: bounds(size(index_arr))
         
-        bounds = start_val + (index_arr - 1)*(end_val - start_val)/(sz - 1)
+        bounds = start_val + (index_arr - 1) * (end_val - start_val) / (size(index_arr) - 1)
         
     end function bounds
     
-
+    ! 
+    !  Takes two 2D arrays for solution and source term and 
+    !  a structure with initial setup. Initializes the two 
+    !  arrays using function from boundaries module.
+    !
     subroutine initialize(u, src, args)
         
-        real(kind=8),  intent(out) :: u(:, :, :)
-        real(kind=8),  intent(out) :: src(:, :, :)
+        real(kind=8),  intent(out) :: u(:, :)
+        real(kind=8),  intent(out) :: src(:, :)
         type(confargs), intent(in) :: args
         
-        
-        integer :: i, j, k
-        real(kind=8), dimension(:) :: xx(size(u, 1)), yy(size(u, 2)), zz(size(u, 3))
+        integer :: i, j
+        real(kind=8) :: xx( size(u, 1) ), yy( size(u, 2) ), h2
         
         xx = (/ (i, i = 1, size(u, 1)) /)
         yy = (/ (i, i = 1, size(u, 2)) /)
-        yy = (/ (i, i = 1, size(u, 3)) /)
         
-        xx = bounds(xx, args%start_pos(1), args%end_pos(1), size(xx))
-        yy = bounds(yy, args%start_pos(2), args%end_pos(2), size(yy))
-        zz = bounds(zz, args%start_pos(3), args%end_pos(3), size(zz))
+        xx = bounds(xx, args%start_pos(1), args%end_pos(1))
+        yy = bounds(yy, args%start_pos(2), args%end_pos(2))
+        h2 = 2d0*(args%dx(1)**2*args%dx(2)**2)/(args%dx(1)**2 + args%dx(2)**2)
         
         ! set the whole array to zero
         u = 0.0d0
         
-        if      (args%ndim == 1) then
-            u(lbound(u, 1), 1, 1) = f0()
-            u(ubound(u, 1), 1, 1) = f1()
-            
-        else if (args%ndim == 2) then
-            u(:, lbound(u, 2), 1) = fx0(xx)
-            u(:, ubound(u, 2), 1) = fx1(xx)
-            u(lbound(u, 1), :, 1) = fy0(yy)
-            u(ubound(u, 1), :, 1) = fy1(yy)
-            
-        else if (args%ndim == 3) then
-            u(:, :, lbound(u, 3)) = fxy0( spread(xx, 2, size(yy)), transpose( spread(yy, 2, size(xx)) ) )        
-            u(:, :, ubound(u, 3)) = fxy1( spread(xx, 2, size(yy)), transpose( spread(yy, 2, size(xx)) ) ) 
-            u(:, lbound(u, 2), :) = fxz0( spread(xx, 2, size(zz)), transpose( spread(zz, 2, size(xx)) ) )        
-            u(:, ubound(u, 2), :) = fxz1( spread(xx, 2, size(zz)), transpose( spread(zz, 2, size(xx)) ) )    
-            u(lbound(u, 1), :, :) = fyz0( spread(yy, 2, size(zz)), transpose( spread(zz, 2, size(yy)) ) )           
-            u(ubound(u, 1), :, :) = fyz1( spread(yy, 2, size(zz)), transpose( spread(zz, 2, size(yy)) ) )     
-            
-        else
-            stop "Invalid value for ndim."
-        end if
+        ! set boundary conditions
+        u(:, lbound(u, 2)) = fx0(xx)
+        u(:, ubound(u, 2)) = fx1(xx)
+        u(lbound(u, 1), :) = fy0(yy)
+        u(ubound(u, 1), :) = fy1(yy)
         
-        do k = 1, size(u, 3) 
-            do j = 1, size(u, 2)
-                do i = 1, size(u, 1)
-                    src(i, j, k) = fsrc(xx(i), yy(j), zz(k))
-                end do
+        ! set the source term array
+        do j = 1, size(u, 2)
+            do i = 1, size(u, 1)
+                src(i, j) = h2 * fsrc(xx(i), yy(j))
             end do
         end do
         
