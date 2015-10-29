@@ -38,5 +38,5 @@ data = data.reshape(list(reversed(dim))).transpose()
 pl.imshow(data, origin='lower', extent=[x0, x1, y0, y1], interpolation='none')
 pl.colorbar(shrink=1.0)
 
-pl.savefig(source.rsplit('.', 1)[0] + '.eps', dpi=300, bbox_inches='tight')
+pl.savefig(source.rsplit('.', 1)[0] + '.png', dpi=300, bbox_inches='tight')
 
