@@ -52,17 +52,20 @@ contains
         
         integer :: k = 0, kmax
         real(kind=8) :: tolerance, change 
+        real(kind=8) :: start_time, stop_time
         
         kmax = args%maxiter
         tolerance = args%eps
         change = 2.0*tolerance 
         
+        call cpu_time(start_time)
         ! iterate the solution until it converges below the level of the tolerance
         do while ((change > tolerance) .and. (k < kmax))
             call solver(u, src, args%dx(1), args%dx(2), change)
             k = k + 1
             if ( (debug) .and. mod(k, 100) == 0 ) then
-                 write (*, *) k, change
+                call cpu_time(stop_time)
+                write (*, *) k, change, (stop_time - start_time)
             endif
         end do
         
