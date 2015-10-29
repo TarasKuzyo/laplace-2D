@@ -1,12 +1,12 @@
 module init
 
-!
+! 
 !  created by Taras Kuzyo 
 !  as part of laplace-2D numerical code
-!
+! 
 !  Defines a function for the initilization of 
 !  solution array and source term array.
-!
+! 
     
     use utils, only: confargs
     use boundaries
@@ -14,11 +14,11 @@ module init
     
 contains 
 
-    !
+    ! 
     ! Takes an array of indexes in range 1..n, values of lower and 
     ! upper bounds for the new array. Returns array of the original 
     ! size with its values in range of lower .. upper.
-    !
+    ! 
     function bounds(index_arr, start_val, end_val)
     
         real(kind=8), intent(in) :: index_arr(:), start_val, end_val
@@ -32,7 +32,7 @@ contains
     !  Takes two 2D arrays for solution and source term and 
     !  a structure with initial setup. Initializes the two 
     !  arrays using function from boundaries module.
-    !
+    ! 
     subroutine initialize(u, src, args)
         
         real(kind=8),  intent(out) :: u(:, :)

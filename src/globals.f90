@@ -1,12 +1,12 @@
 module globals
 
-!
+! 
 !  created by Taras Kuzyo 
 !  as part of laplace-2D numerical code
-!
+! 
 !  Defines some global constants and variables
 !  for use in other modules
-!
+! 
 
     implicit none
     ! number of spatial dimensions

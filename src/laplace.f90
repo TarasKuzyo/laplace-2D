@@ -1,19 +1,24 @@
 module laplace 
-!
+! 
 !  created by Taras Kuzyo 
 !  as part of laplace-2D numerical code
 
-!
+! 
 !  defines and interface for the solution
 !  subroutine and a number of different 
 !  solving subroutines using different methods
-!
+! 
     use globals, only: debug, pi
     use utils, only: confargs
     implicit none
     
 contains
 
+    ! 
+    ! A wrraper of the solving function.
+    ! Calls laplace_setup_solver with the solver
+    ! based on the value of args%solver
+    ! 
     subroutine laplace_solve(u, src, args, nsteps)
     
         real(kind=8), intent(inout) :: u(:, :)
@@ -30,7 +35,7 @@ contains
     end subroutine laplace_solve
     
 
-    subroutine laplace_setup_solver(u, src,  solver, args, nsteps)
+    subroutine laplace_setup_solver(u, src, solver, args, nsteps)
     
         real(kind=8), intent(inout) :: u(:, :)
         real(kind=8), intent(in)    :: src(:, :)
@@ -56,6 +61,9 @@ contains
         do while ((change > tolerance) .and. (k < kmax))
             call solver(u, src, args%dx(1), args%dx(2), change)
             k = k + 1
+            if ( (debug) .and. mod(k, 100) == 0 ) then
+                 write (*, *) k, change
+            endif
         end do
         
         nsteps = k
@@ -79,14 +87,13 @@ contains
         beta  = dx**2/(dx**2 + dy**2)
         
         omega = 2d0 - 2d0*pi*sqrt(dx*dy)
-        !4.0d0/(2.0 + sqrt( 4 - (cos(pi/n_x) + cos(pi/n_y))**2) )
         
         change = 0.0
         do j = lbound(u, 2) + 1, ubound(u, 2) - 1
             do i = lbound(u, 1) + 1, ubound(u, 1) - 1
                 diff = 0.5*omega * ( alpha * ( u(i+1, j) + u(i-1, j) ) + &
                                      beta  * ( u(i, j+1) + u(i, j-1) ) - &
-                                     2d0*u(i, j) - 0.5 * src(i, j) )
+                                     2d0 * u(i, j) - 0.5 * src(i, j) )
 
                 u(i, j) = u(i, j) + diff
                 change  = max(change, abs(diff))

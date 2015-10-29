@@ -30,13 +30,11 @@ data   = np.fromfile(source, dtype='d')
 config_file = 'laplace.ini'
 (x0, y0), (x1, y1), dim = read_config(config_file)
 
-data = data.reshape(list(reversed(dim))).T
+data = data.reshape(list(reversed(dim))).transpose()
 
 
 
       
-
-
 pl.imshow(data, origin='lower', extent=[x0, x1, y0, y1], interpolation='none')
 pl.colorbar(shrink=1.0)
 

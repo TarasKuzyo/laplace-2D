@@ -1,12 +1,12 @@
 program driver
-!
+! 
 !  created by Taras Kuzyo 
 !  as part of laplace-2D numerical code
-!
+! 
 !  Defines the main program.
 !  -- describe command line parameter
 !  --
-!
+! 
 
     use utils,   only: confargs, read_config, write_binary
     use init,    only: initialize
