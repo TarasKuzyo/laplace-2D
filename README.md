@@ -4,3 +4,6 @@ on the rectangular grid.
 
 The code solves the equation u_{xx} + u_{yy} = f(x, y)
 with the value of u(x, y) defined on the domain boundary.
+
+
+<a><img src="solution.eps" align="left" height="350" alt="laplace equation"></a>
