@@ -63,10 +63,12 @@ contains
         do while ((change > tolerance) .and. (k < kmax))
             call solver(u, src, args%dx(1), args%dx(2), change)
             k = k + 1
-            if ( (debug) .and. mod(k, 100) == 0 ) then
+            
+            if ( debug .and. mod(k, 100) == 0 ) then
                 call cpu_time(stop_time)
-                write (*, *) k, change, (stop_time - start_time)
+                write (*, '("#", I5.5, " ", E12.6, " ", F13.3)') k, change, (stop_time - start_time)
             endif
+            
         end do
         
         nsteps = k
