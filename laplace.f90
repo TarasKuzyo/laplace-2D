@@ -56,7 +56,11 @@ contains
         
         kmax = args%maxiter
         tolerance = args%eps
-        change = 2.0*tolerance 
+        change = 2.0*tolerance
+         
+        if ( debug  ) then
+            write (*, '(A)') "Step   Tolerance     Time, s"
+        endif
         
         call cpu_time(start_time)
         ! iterate the solution until it converges below the level of the tolerance
@@ -70,10 +74,12 @@ contains
             endif
             
         end do
+        call cpu_time(stop_time)
         
         nsteps = k
         if (nsteps == kmax) write (*, *) 'warning: the maximum number of iterations reached'
-        write (*, *) 'nsteps = ', nsteps
+        write (*, '(A, I5)') 'nsteps = ', nsteps
+        write (*, '(A, F13.3, A)') 'time elapsed = ', stop_time - start_time, ' s'
     
     end subroutine laplace_setup_solver
 
