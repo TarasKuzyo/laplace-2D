@@ -15,15 +15,14 @@ program driver
     
     type(confargs) :: args
     integer :: alstat, nsteps
-    character(len=64) :: config_filename, output_filename
+    character(len=64) :: config_filename
     real(kind=8), allocatable :: u(:, :), source(:, :)
     
     config_filename = 'laplace.ini'
-    output_filename = 'output.dbl'
     
     if (command_argument_count() == 1) then
-        call get_command_argument(1, output_filename)
-        write(*, *) output_filename
+        call get_command_argument(1, config_filename)
+        write(*, *) config_filename
     end if
     
     
@@ -40,7 +39,7 @@ program driver
     call initialize(u, source, args)
     call laplace_solve(u, source, args, nsteps)
     
-    call write_binary(output_filename, u)
+    call write_binary(args%output_file, u)
         
     deallocate(u, source)
 

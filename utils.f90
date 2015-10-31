@@ -7,6 +7,7 @@ module utils
         integer       :: maxiter, d(nd)
         real(kind=8)  :: start_pos(nd), end_pos(nd), dx(nd), eps
         character(16) :: solver
+        character(64) :: output_file
     end type confargs
 
 
@@ -29,6 +30,7 @@ contains
         read(read_uid, *) skip_buffer, args%eps
         read(read_uid, *) skip_buffer, args%maxiter
         read(read_uid, *) skip_buffer, args%solver
+        read(read_uid, *) skip_buffer, args%output_file
         
         do i = 1, nd
             read(read_uid, *) skip_buffer, args%start_pos(i), args%end_pos(i), args%d(i)
