@@ -12,29 +12,25 @@ def read_config(filename):
         
     for line in lines:
         
-        if   'x-dir' in line:
+        if 'x-dir' in line:
             x0, x1, nx = map(float, filter(lambda x: x, line.split('x-dir', 1)[1].split(' ')) )
         elif 'y-dir' in line: 
             y0, y1, ny = map(float, filter(lambda x: x, line.split('y-dir', 1)[1].split(' ')) )
         
-        
-    return ((x0, y0), (x1, y1), (nx, ny))
+    return (x0, y0), (x1, y1), (int(nx), int(ny))
     
 
 if len(sys.argv) < 2:
     sys.exit('usage: {} source-file'.format(sys.argv[0]))
 
 source = sys.argv[1]
-data   = np.fromfile(source, dtype='d')
+data = np.fromfile(source, dtype='d')
 
 config_file = 'laplace.ini'
 (x0, y0), (x1, y1), dim = read_config(config_file)
 
-data = data.reshape(list(reversed(dim))).transpose()
+data = data.reshape(dim[::-1]).transpose()
 
-
-
-      
 pl.imshow(data, origin='lower', extent=[x0, x1, y0, y1], interpolation='none')
 pl.colorbar(shrink=1.0)
 

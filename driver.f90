@@ -8,6 +8,7 @@ program driver
 !  --
 ! 
 
+    use omp_lib
     use utils,   only: confargs, read_config, write_binary
     use init,    only: initialize
     use laplace, only: laplace_solve
@@ -25,7 +26,11 @@ program driver
         write(*, *) config_filename
     end if
     
-    
+    !$OMP PARALLEL
+    !$OMP MASTER
+    write(*,*) 'Number of threads: ', omp_get_num_threads()
+    !$OMP END MASTER
+    !$OMP END PARALLEL
     call read_config(config_filename, args)
     
     
