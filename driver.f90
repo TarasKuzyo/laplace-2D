@@ -26,11 +26,6 @@ program driver
         write(*, *) config_filename
     end if
     
-    !$OMP PARALLEL
-    !$OMP MASTER
-    write(*,*) 'Number of threads: ', omp_get_num_threads()
-    !$OMP END MASTER
-    !$OMP END PARALLEL
     call read_config(config_filename, args)
     
     

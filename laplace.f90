@@ -8,7 +8,6 @@ module laplace
 !  subroutine and a number of different 
 !  solving subroutines using different methods
 ! 
-    use omp_lib
     use globals, only: debug, pi
     use utils, only: confargs
     implicit none
@@ -68,13 +67,13 @@ contains
         call system_clock(start_time)
         ! iterate the solution until it converges below the level of the tolerance
         do while ((change > tolerance) .and. (k < kmax))
+        
             call solver(u, src, args%dx(1), args%dx(2), change)
-            k = k + 1
-            
-            if ( debug .and. mod(k, 100) == 0 ) then
+            if (debug .and. mod(k, 100) == 0) then
                 call system_clock(stop_time)
                 write (*, '("#", I5.5, " ", E12.6, " ", F13.3)') k, change, (stop_time - start_time)/real(rate)
             endif
+            k = k + 1
             
         end do
         call system_clock(stop_time)
@@ -137,9 +136,11 @@ contains
         
         change_red = 0.0
         change_black = 0.0
+        
 
         ! red cells
-        !$OMP PARALLEL DO PRIVATE(diff) REDUCTION(MAX:change_red) 
+        !$OMP PARALLEL
+        !$OMP DO PRIVATE(diff) REDUCTION(MAX:change_red) 
         do j = lbound(u, 2) + 1, ubound(u, 2) - 1
             do i = lbound(u, 1) + 1 + mod(j, 2), ubound(u, 1) - 1, 2
                 diff = 0.5*omega * ( alpha * ( u(i+1, j) + u(i-1, j) ) + &
@@ -150,12 +151,10 @@ contains
                 change_red = max(change_red, abs(diff))
             end do
         end do
-        !$OMP END PARALLEL DO
+        !$OMP END DO
         
-        !$OMP BARRIER
-
         ! black cells
-        !$OMP PARALLEL DO PRIVATE(diff) REDUCTION(MAX:change_black)
+        !$OMP DO PRIVATE(diff) REDUCTION(MAX:change_black)
         do j = lbound(u, 2) + 1, ubound(u, 2) - 1
             do i = lbound(u, 1) + 2 - mod(j, 2), ubound(u, 1) - 1, 2
                 diff = 0.5*omega * ( alpha * ( u(i+1, j) + u(i-1, j) ) + &
@@ -166,9 +165,9 @@ contains
                 change_black = max(change_black, abs(diff))
             end do
         end do
-        !$OMP END PARALLEL DO
-        
-        !$OMP BARRIER
+        !$OMP END DO
+        !$OMP END PARALLEL
+       
         change = max(change_red, change_black)
 
     end subroutine SOR5_red_black

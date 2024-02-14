@@ -50,20 +50,23 @@ contains
         h2 = 2d0*(args%dx(1)**2*args%dx(2)**2)/(args%dx(1)**2 + args%dx(2)**2)
         
         ! set the whole array to zero
-        u = 0.0d0
+        !u = 0.0d0
+        
+        
+        
+        ! set the source term array
+        do j = 1, size(u, 2)
+            do i = 1, size(u, 1)
+                u(i, j) = 0.0d0
+                src(i, j) = h2 * fsrc(xx(i), yy(j))
+            end do
+        end do
         
         ! set boundary conditions
         u(:, lbound(u, 2)) = fx0(xx)
         u(:, ubound(u, 2)) = fx1(xx)
         u(lbound(u, 1), :) = fy0(yy)
         u(ubound(u, 1), :) = fy1(yy)
-        
-        ! set the source term array
-        do j = 1, size(u, 2)
-            do i = 1, size(u, 1)
-                src(i, j) = h2 * fsrc(xx(i), yy(j))
-            end do
-        end do
         
     end subroutine initialize        
 

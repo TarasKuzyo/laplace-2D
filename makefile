@@ -1,6 +1,6 @@
 FC=gfortran
 FCFLAGS=-g -O2 -Wall -fopenmp
-FLFLAGS=
+FLFLAGS=-lgomp
 
 SOURCES=globals.f90 utils.f90 boundaries.f90 init.f90 laplace.f90 driver.f90
 OBJECTS=$(SOURCES:.f90=.o)
