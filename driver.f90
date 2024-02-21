@@ -8,9 +8,8 @@ program driver
 !  --
 !
 
-    use omp_lib
-    use utils,   only: confargs, read_config, write_binary
-    use init,    only: initialize
+    use utils, only: confargs, read_config, write_binary
+    use init, only: initialize, accuracy
     use laplace, only: laplace_solve
     implicit none
 
@@ -40,6 +39,8 @@ program driver
     call laplace_solve(u, source, args, nsteps)
 
     call write_binary(args%output_file, u)
+
+    write(*, *) accuracy(u, args)
 
     deallocate(u, source)
 

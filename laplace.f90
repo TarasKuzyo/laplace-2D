@@ -28,6 +28,8 @@ contains
 
         if (args%solver == 'SOR5') then
             call laplace_setup_solver(u, src,  SOR5, args, nsteps)
+        else if (args%solver == 'SOR9') then
+            call laplace_setup_solver(u, src,  SOR9, args, nsteps)
         else if (args%solver == 'SOR5-RB') then
             call laplace_setup_solver(u, src,  SOR5_red_black, args, nsteps)
         else
@@ -97,17 +99,16 @@ contains
         real(kind=8) :: diff, omega
         real(kind=8) :: alpha, beta
 
-        alpha = dy**2/(dx**2 + dy**2)
-        beta  = dx**2/(dx**2 + dy**2)
+        alpha = dy**2/(2d0 * (dx**2 + dy**2))
+        beta  = dx**2/(2d0 * (dx**2 + dy**2))
 
         omega = 2d0 - 2d0*pi*sqrt(dx*dy)
 
         change = 0.0
         do j = lbound(u, 2) + 1, ubound(u, 2) - 1
             do i = lbound(u, 1) + 1, ubound(u, 1) - 1
-                diff = 0.5*omega * ( alpha * ( u(i+1, j) + u(i-1, j) ) + &
-                                     beta  * ( u(i, j+1) + u(i, j-1) ) - &
-                                     2d0 * u(i, j) - 0.5 * src(i, j) )
+                diff = omega * ( alpha * ( u(i+1, j) + u(i-1, j) ) + beta * ( u(i, j+1) + u(i, j-1) ) - &
+                                 u(i, j) - 0.25d0 * src(i, j) )
 
                 u(i, j) = u(i, j) + diff
                 change = max(change, abs(diff))
@@ -129,23 +130,21 @@ contains
         real(kind=8) :: diff, omega, change_red, change_black
         real(kind=8) :: alpha, beta
 
-        alpha = dy**2/(dx**2 + dy**2)
-        beta  = dx**2/(dx**2 + dy**2)
+        alpha = dy**2/(2d0 * (dx**2 + dy**2))
+        beta  = dx**2/(2d0 * (dx**2 + dy**2))
 
         omega = 2d0 - 2d0*pi*sqrt(dx*dy)
 
         change_red = 0.0
         change_black = 0.0
 
-
         ! red cells
         !$OMP PARALLEL
         !$OMP DO PRIVATE(diff) REDUCTION(MAX:change_red)
         do j = lbound(u, 2) + 1, ubound(u, 2) - 1
             do i = lbound(u, 1) + 1 + mod(j, 2), ubound(u, 1) - 1, 2
-                diff = 0.5*omega * ( alpha * ( u(i+1, j) + u(i-1, j) ) + &
-                                     beta  * ( u(i, j+1) + u(i, j-1) ) - &
-                                     2d0 * u(i, j) - 0.5 * src(i, j) )
+                diff = omega * ( alpha * ( u(i+1, j) + u(i-1, j) ) + beta * ( u(i, j+1) + u(i, j-1) ) - &
+                                 u(i, j) - 0.25d0 * src(i, j) )
 
                 u(i, j) = u(i, j) + diff
                 change_red = max(change_red, abs(diff))
@@ -157,9 +156,8 @@ contains
         !$OMP DO PRIVATE(diff) REDUCTION(MAX:change_black)
         do j = lbound(u, 2) + 1, ubound(u, 2) - 1
             do i = lbound(u, 1) + 2 - mod(j, 2), ubound(u, 1) - 1, 2
-                diff = 0.5*omega * ( alpha * ( u(i+1, j) + u(i-1, j) ) + &
-                                     beta  * ( u(i, j+1) + u(i, j-1) ) - &
-                                     2d0 * u(i, j) - 0.5 * src(i, j) )
+                diff = omega * ( alpha * ( u(i+1, j) + u(i-1, j) ) + beta  * ( u(i, j+1) + u(i, j-1) ) - &
+                                 u(i, j) - 0.25d0 * src(i, j) )
 
                 u(i, j) = u(i, j) + diff
                 change_black = max(change_black, abs(diff))
@@ -184,19 +182,18 @@ contains
         real(kind=8) :: diff, omega
         real(kind=8) :: alpha, beta
 
-        alpha = dy**2/(dx**2 + dy**2)
-        beta  = dx**2/(dx**2 + dy**2)
+        alpha = (5d0*dy**2 - dx**2)/(10d0 * (dx**2 + dy**2))
+        beta  = (5d0*dx**2 - dy**2)/(10d0 * (dx**2 + dy**2))
 
-        omega = 2d0 - 2d0*pi*sqrt(dx*dy)
+        omega = 1.8d0 !2d0 - sqrt(936d0 / 209d0)*pi*sqrt(dx*dy) TODO
 
         change = 0.0
         do j = lbound(u, 2) + 1, ubound(u, 2) - 1
             do i = lbound(u, 1) + 1, ubound(u, 1) - 1
-                diff = 0.5*omega * ( alpha * ( u(i+1, j) + u(i-1, j) ) + &
-                                     beta  * ( u(i, j+1) + u(i, j-1) ) - &
-                                     2d0 * u(i, j) - 0.5 * src(i, j) )
-
+                diff = omega * ( alpha * ( u(i+1, j) + u(i-1, j) ) + beta * ( u(i, j+1) + u(i, j-1) ) + &
+                                 ( u(i+1, j+1) + u(i-1, j+1) + u(i-1, j+1) + u(i-1, j-1) - src(i, j) )/20d0 - u(i, j) )
                 u(i, j) = u(i, j) + diff
+
                 change = max(change, abs(diff))
 
             end do

@@ -50,14 +50,11 @@ contains
         h2 = 2d0*(args%dx(1)**2*args%dx(2)**2)/(args%dx(1)**2 + args%dx(2)**2)
 
         ! set the whole array to zero
-        !u = 0.0d0
-
-
+        u = 0.0d0
 
         ! set the source term array
         do j = 1, size(u, 2)
             do i = 1, size(u, 1)
-                u(i, j) = 0.0d0
                 src(i, j) = h2 * fsrc(xx(i), yy(j))
             end do
         end do
@@ -69,6 +66,30 @@ contains
         u(ubound(u, 1), :) = fy1(yy)
 
     end subroutine initialize
+
+    function accuracy(u, args)
+
+        real(kind=8),  intent(in) :: u(:, :)
+        type(confargs), intent(in) :: args
+        real(kind=8) :: accuracy
+
+        integer :: i, j
+        real(kind=8) :: xx( size(u, 1) ), yy( size(u, 2) )
+
+        xx = (/ (i, i = 1, size(u, 1)) /)
+        yy = (/ (i, i = 1, size(u, 2)) /)
+
+        xx = bounds(xx, args%start_pos(1), args%end_pos(1))
+        yy = bounds(yy, args%start_pos(2), args%end_pos(2))
+
+        accuracy = 0
+        do j = 1, size(u, 2)
+            do i = 1, size(u, 1)
+                accuracy = max(accuracy, abs(u(i, j) - fexact(xx(i), yy(j))))
+            end do
+        end do
+
+    end function accuracy
 
 end module init
 

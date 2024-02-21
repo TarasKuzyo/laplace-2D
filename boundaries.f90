@@ -17,7 +17,7 @@ module boundaries
 !
 !          Geometry:
 !
-!                   fx1(x)
+!                   fx0(x)
 !           _____________________
 !          |                     |
 !          |                     |
@@ -31,7 +31,7 @@ module boundaries
 !          |                     |
 !          |_____________________|
 !
-!                   fx0(x)
+!                   fx1(x)
 !
 !
 !
@@ -55,7 +55,7 @@ contains
         real(kind=8), intent(in) :: x
         real(kind=8) :: fx0
 
-        fx0 = 0.0d0*x
+        fx0 = log((x + 1d0)**2)
 
     end function fx0
 
@@ -65,7 +65,7 @@ contains
         real(kind=8), intent(in) :: x
         real(kind=8) :: fx1
 
-        fx1 = 2d0*x*(1d0 - x)
+        fx1 = log((x + 1d0)**2 + 1d0)
 
     end function fx1
 
@@ -75,7 +75,7 @@ contains
         real(kind=8), intent(in) :: y
         real(kind=8) :: fy0
 
-        fy0 = 3d0*y*(1d0 - y)**0.5
+        fy0 = log(1d0 + y**2)
 
     end function fy0
 
@@ -85,7 +85,7 @@ contains
         real(kind=8), intent(in) :: y
         real(kind=8) :: fy1
 
-        fy1 = 4d0*y*(1d0 - y)
+        fy1 = log(4d0 + y**2)
 
     end function fy1
 
